@@ -82,31 +82,19 @@ function isAllowedHost(hostname) {
 
 // IPC listeners (registered once, outside createWindow to avoid leaks)
 ipcMain.on('zoom-in', () => {
-  console.log('zoom-in');
-  if (!win || win.isDestroyed()) {
-    console.warn('zoom-in: window not available');
-    return;
-  }
+  if (!win || win.isDestroyed()) return;
   const currentZoom = win.webContents.getZoomLevel();
-  win.webContents.setZoomLevel(currentZoom + 1);
+  win.webContents.setZoomLevel(Math.min(currentZoom + 0.5, 5));
 });
 
 ipcMain.on('zoom-out', () => {
-  console.log('zoom-out');
-  if (!win || win.isDestroyed()) {
-    console.warn('zoom-out: window not available');
-    return;
-  }
+  if (!win || win.isDestroyed()) return;
   const currentZoom = win.webContents.getZoomLevel();
-  win.webContents.setZoomLevel(currentZoom - 1);
+  win.webContents.setZoomLevel(Math.max(currentZoom - 0.5, -3));
 });
 
 ipcMain.on('zoom-reset', () => {
-  console.log('zoom-reset');
-  if (!win || win.isDestroyed()) {
-    console.warn('zoom-reset: window not available');
-    return;
-  }
+  if (!win || win.isDestroyed()) return;
   win.webContents.setZoomLevel(0);
 });
 
@@ -434,13 +422,40 @@ function createWindow () {
     return { action: 'deny' };
   });
 
-  win.webContents.on('before-input-event', (event, input) => {
-    if (input.control && input.key.toLowerCase() === 'r') {
-      console.log('Pressed Control+R')
-      event.preventDefault()
-      win.loadURL(appURL);
+  // Enable pinch-to-zoom / touchpad scaling
+  win.webContents.setVisualZoomLevelLimits(1, 3);
+
+  // Handle zoom-changed event (e.g. mouse wheel + Ctrl or touchpad)
+  win.webContents.on('zoom-changed', (event, zoomDirection) => {
+    const currentZoom = win.webContents.getZoomLevel();
+    if (zoomDirection === 'in') {
+      win.webContents.setZoomLevel(Math.min(currentZoom + 0.5, 5));
+    } else {
+      win.webContents.setZoomLevel(Math.max(currentZoom - 0.5, -3));
     }
-  })
+  });
+
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.type !== 'keyDown') return;
+
+    if (input.control || input.meta) {
+      if (input.key === '=' || input.key === '+' || input.code === 'Equal' || input.code === 'NumpadAdd') {
+        const currentZoom = win.webContents.getZoomLevel();
+        win.webContents.setZoomLevel(Math.min(currentZoom + 0.5, 5));
+        event.preventDefault();
+      } else if (input.key === '-' || input.key === '_' || input.code === 'Minus' || input.code === 'NumpadSubtract') {
+        const currentZoom = win.webContents.getZoomLevel();
+        win.webContents.setZoomLevel(Math.max(currentZoom - 0.5, -3));
+        event.preventDefault();
+      } else if (input.key === '0' || input.code === 'Digit0' || input.code === 'Numpad0') {
+        win.webContents.setZoomLevel(0);
+        event.preventDefault();
+      } else if (input.key.toLowerCase() === 'r') {
+        event.preventDefault();
+        win.loadURL(appURL);
+      }
+    }
+  });
 }
 
 // Ensure we're a single instance app

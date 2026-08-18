@@ -65,27 +65,27 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Handle keyboard shortcuts for zoom
+// Handle keyboard shortcuts for zoom (fallback if window before-input-event misses it)
 document.addEventListener('keydown', (event) => {
-    if (event.ctrlKey) {
-        if (event.key === '+') {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === '=' || event.key === '+' || event.code === 'Equal' || event.code === 'NumpadAdd') {
             ipcRenderer.send('zoom-in');
-        } else if (event.key === '-') {
+        } else if (event.key === '-' || event.key === '_' || event.code === 'Minus' || event.code === 'NumpadSubtract') {
             ipcRenderer.send('zoom-out');
-        } else if (event.key === '0') {
+        } else if (event.key === '0' || event.code === 'Digit0' || event.code === 'Numpad0') {
             ipcRenderer.send('zoom-reset');
         }
     }
 });
 
-// Handle mouse wheel zoom
+// Handle mouse wheel zoom (Ctrl + scroll wheel)
 document.addEventListener('wheel', (event) => {
-    if (event.ctrlKey) {
-        event.preventDefault(); // Prevent default scrolling
+    if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
         if (event.deltaY < 0) {
             ipcRenderer.send('zoom-in');
         } else {
             ipcRenderer.send('zoom-out');
         }
     }
-});
+}, { passive: false });
