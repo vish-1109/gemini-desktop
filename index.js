@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, session } = require('electron');
 const { join, relative, normalize, isAbsolute, sep } = require('path');
 const { fileURLToPath } = require('url');
 const fs = require('fs');
@@ -27,12 +27,13 @@ Keywords=AI;Copilot;GPT;ChatGPT;Gemini;DeepSeek;
 StartupWMClass=Gemini
 `;
 
-// Use a standard Chrome user-agent to avoid bot/embedded-browser detection
-const chromeVersion = process.versions.chrome;
-const standardUA = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
-app.userAgentFallback = standardUA;
+// Strip Electron/app identifiers from the default UA to look like vanilla Chrome
+const cleanUA = app.userAgentFallback
+  .replace(/\sElectron\/\S+/, '')
+  .replace(/\sgemini-desktop\/\S+/i, '');
+app.userAgentFallback = cleanUA;
 
-// Remove navigator.webdriver flag that marks this as an automated browser
+// Remove flags that mark this as an automated or embedded browser
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
 
 function initializeAutostart() {
@@ -61,11 +62,23 @@ function handleAutoStartChange() {
 }
 
 // Centralized list of hosts allowed to navigate within the Electron window
-// Used by both will-navigate handler and preload click handler
 const allowedHosts = [
   'gemini.google.com',
   'accounts.google.com',
+  'myaccount.google.com',
+  'gds.google.com',
+  'ogs.google.com',
+  'oauth2.googleapis.com',
 ];
+
+function isAllowedHost(hostname) {
+  if (!hostname) return false;
+  if (allowedHosts.includes(hostname)) return true;
+  if (hostname === 'google.com' || hostname.endsWith('.google.com') || hostname.endsWith('.google.co.in') || hostname.endsWith('.googleapis.com') || hostname.endsWith('.gstatic.com')) {
+    return true;
+  }
+  return false;
+}
 
 // IPC listeners (registered once, outside createWindow to avoid leaks)
 ipcMain.on('zoom-in', () => {
@@ -184,10 +197,22 @@ function createWindow () {
     show: isScreenshotMode ? false : !isTray, // Start hidden if --tray or screenshot mode
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
       sandbox: false
     }
+  });
+
+  win.webContents.setUserAgent(cleanUA);
+
+  // Neutralize navigator.userAgentData so Google cannot detect the Electron/Chromium
+  // embedded browser fingerprint. This runs in the page context on every navigation.
+  win.webContents.on('dom-ready', () => {
+    win.webContents.executeJavaScript(`
+      try {
+        Object.defineProperty(navigator, 'userAgentData', { get: () => undefined });
+      } catch(e) {}
+    `).catch(() => {});
   });
 
   win.removeMenu();
@@ -353,7 +378,7 @@ function createWindow () {
       
       // Only handle http(s) protocols - prevent potentially unsafe protocols
       if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-        if (!allowedHostsSet.has(targetHostname)) {
+        if (!isAllowedHost(targetHostname)) {
           console.log('will-navigate external: ', url);
           event.preventDefault();
           shell.openExternal(url);
@@ -371,9 +396,8 @@ function createWindow () {
 
   const appHost = new URL(appURL).host;
 
-  // New-window requests (window.open / target="_blank"): only keep the
-  // app host in-app; everything else opens in the default browser with
-  // a strict allowlist of URL schemes.
+  // New-window requests (window.open / target="_blank"): keep Google
+  // auth & app hosts in-app; everything else opens in the default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
     console.log('windowOpenHandler: ', url);
 
@@ -393,8 +417,8 @@ function createWindow () {
 
     const { protocol, host } = parsedUrl;
 
-    // Keep same-host http(s) links in-app
-    if ((protocol === 'https:' || protocol === 'http:') && host === appHost) {
+    // Keep allowed/Google hosts in-app
+    if ((protocol === 'https:' || protocol === 'http:') && isAllowedHost(host)) {
       win.loadURL(url);
       return { action: 'deny' };
     }
@@ -519,6 +543,19 @@ ipcMain.on('get-app-metadata', (event) => {
 app.on('ready', () => {
   console.log(`Electron Version: ${process.versions.electron}`);
   console.log(`App Version: ${app.getVersion()}`);
+
+  session.defaultSession.setUserAgent(cleanUA);
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['User-Agent'] = cleanUA;
+    // Strip client-hint headers that reveal Electron identity
+    delete details.requestHeaders['sec-ch-ua'];
+    delete details.requestHeaders['sec-ch-ua-mobile'];
+    delete details.requestHeaders['sec-ch-ua-platform'];
+    delete details.requestHeaders['Sec-Ch-Ua'];
+    delete details.requestHeaders['Sec-Ch-Ua-Mobile'];
+    delete details.requestHeaders['Sec-Ch-Ua-Platform'];
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
 
   if (!isScreenshotMode) {
     tray = new Tray(icon);

@@ -45,10 +45,15 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
         const link = target.closest('a');
         if (link && link.href && link.href.startsWith('http')) {
-            try {
-                // Use hostname (not host) to exclude port from comparison
-                const hostname = new URL(link.href).hostname;
-                if (allowedHosts.has(hostname)) {
+                // Check if allowed host or Google auth domain
+                const isAllowed = allowedHosts.has(hostname) ||
+                    hostname === 'google.com' ||
+                    hostname.endsWith('.google.com') ||
+                    hostname.endsWith('.google.co.in') ||
+                    hostname.endsWith('.googleapis.com') ||
+                    hostname.endsWith('.gstatic.com');
+
+                if (isAllowed) {
                     return; // Allow app + auth links to navigate in-app
                 }
             } catch (e) {
