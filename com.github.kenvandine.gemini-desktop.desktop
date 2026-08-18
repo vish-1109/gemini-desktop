@@ -1,9 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Name=Gemini
-Comment=Google Gemini
-Type=Application
-Exec=gemini-desktop
-Icon=${SNAP}/unpacked/resources/app/icon.png
-Categories=Accessories;
-Keywords=AI;Copilot;GPT;ChatGPT;Gemini;

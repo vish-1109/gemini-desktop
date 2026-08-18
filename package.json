@@ -1,37 +1,51 @@
 {
   "name": "gemini-desktop",
+  "productName": "Gemini",
+  "desktopName": "gemini-desktop.desktop",
   "title": "Gemini Desktop",
-  "version": "@@VERSION@@",
-  "description": "Unofficial Web app for Google Gemini providing the desktop user experience you would expect on Ubuntu or any other Linux desktop.",
+  "version": "1.0.0",
+  "description": "Unofficial Web app for Google Gemini providing the desktop user experience on Debian and Linux desktops. Based on work by Ken VanDine.",
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --publish never",
-    "screenshot": "TEST_SCREENSHOT=1 electron ."
+    "build": "electron-builder --publish never"
   },
   "build": {
-    "asar": false,
+    "productName": "Gemini",
+    "executableName": "gemini-desktop",
+    "asar": true,
+    "icon": "icon.png",
     "linux": {
       "target": [
-	      "dir"
+        "deb"
       ],
       "category": "Utility",
-      "artifactName": "${name}_${version}_linux.${ext}"
+      "artifactName": "${name}_${version}_${arch}.${ext}"
     },
-    "extraFiles": [
-      "com.github.kenvandine.${name}.desktop"
-    ]
+    "deb": {
+      "packageName": "gemini-desktop",
+      "afterRemove": "scripts/after-remove.tpl",
+      "fpm": [
+        "build/metainfo/gemini-desktop.metainfo.xml=/usr/share/metainfo/gemini-desktop.metainfo.xml"
+      ],
+      "depends": [
+        "libasound2t64 | libasound2",
+        "libnotify4",
+        "libxtst6",
+        "libnss3"
+      ]
+    }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kenvandine/gemini-desktop.git"
+    "url": "https://github.com/vish-1109/gemini-desktop.git"
   },
-  "author": "Ken VanDine",
+  "author": "Vishrut <vishrutgundaji@gmail.com>",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/kenvandine/gemini-desktop/issues"
+    "url": "https://github.com/vish-1109/gemini-desktop/issues"
   },
-  "homepage": "https://github.com/kenvandine/gemini-desktop#readme",
+  "homepage": "https://github.com/vish-1109/gemini-desktop#readme",
   "devDependencies": {
     "electron": "^40.2.1",
     "electron-builder": "^26.7.0",

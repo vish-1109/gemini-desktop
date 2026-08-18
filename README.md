@@ -1,45 +1,53 @@
-# About
+# Gemini Desktop
 
+Unofficial desktop wrapper for Google Gemini, providing a desktop user experience on Debian and Linux desktops.
 
-Unofficial wrapper for Google's Gemini, providing a native Linux desktop experince.
+Maintained by **Vishrut** ([@vish-1109](https://github.com/vish-1109)). Based on original work by **Ken VanDine** ([@kenvandine](https://github.com/kenvandine)).
+
+📦 **[Download Latest .deb Release](https://github.com/vish-1109/gemini-desktop/releases)**
 
 ## Disclaimer
 
-This project and its contributors are not affiliated with Google. This is simply an Electron wrapper that loads the offical Google Gemini web application.
-# Installation
+This project and its contributors are not affiliated with Google. This is an Electron desktop application that loads the official Google Gemini web application with desktop integration.
 
-[![Get it from the Snap Store](https://raw.githubusercontent.com/snapcore/snap-store-badges/master/EN/%5BEN%5D-snap-store-white.png)](https://snapcraft.io/gemini-desktop)
+## Installation
 
-[![gemini-desktop](https://snapcraft.io/gemini-desktop/badge.svg)](https://snapcraft.io/gemini-desktop)
-[![gemini-desktop](https://snapcraft.io/gemini-desktop/trending.svg?name=0)](https://snapcraft.io/gemini-desktop)
+### Debian / Ubuntu (.deb)
+
+Download the `.deb` from the [Releases](https://github.com/vish-1109/gemini-desktop/releases) page or build from source, then install with:
+
+```bash
+sudo apt install -y ./gemini-desktop_1.0.0_amd64.deb
+```
 
 ## Requirements
 
-You will need to install [npm](https://www.npmjs.com/), the Node.js package manager. On most distributions, the package is simply called `npm`.
+You will need Node.js and [npm](https://www.npmjs.com/).
 
 ## Cloning the source code
 
-Once you have npm, clone the wrapper to a convenient location:
-
 ```bash
-git clone https://github.com/kenvandine/gemini-desktop.git
+git clone https://github.com/vish-1109/gemini-desktop.git
+cd gemini-desktop
 ```
 
-## Building
+## Development & Building
 
+Install dependencies:
 ```bash
 npm install
+```
+
+Run locally:
+```bash
 npm start
 ```
 
-On subsequent runs, `npm start` will be all that's required.
-
-## Updating the source code
-
-Simply pull the latest version of master and install any changed dependencies:
-
+Build Debian package:
 ```bash
-git checkout main
-git pull
-npm install
+npm run build
 ```
+
+## Issues & Support
+
+Please report issues at: [https://github.com/vish-1109/gemini-desktop/issues](https://github.com/vish-1109/gemini-desktop/issues)

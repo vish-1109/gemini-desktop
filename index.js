@@ -9,36 +9,54 @@ let wasOffline = false;
 const appURL = 'https://gemini.google.com'
 const icon = nativeImage.createFromPath(join(__dirname, 'icon.png'));
 const isTray = process.argv.includes('--tray');
-const snapPath = process.env.SNAP
-const snapUserData = process.env.SNAP_USER_DATA
 const isScreenshotMode = process.env.TEST_SCREENSHOT === '1';
 const screenshotPath = process.env.SCREENSHOT_PATH || 'screenshot.png';
 let autostart = false;
 
+const autostartDir = join(app.getPath('home'), '.config', 'autostart');
+const autostartFile = join(autostartDir, 'gemini-desktop.desktop');
+const autostartDesktopContent = `[Desktop Entry]
+Encoding=UTF-8
+Name=Gemini
+Comment=Unofficial Web app for Gemini
+Type=Application
+Exec=gemini-desktop --tray
+Icon=gemini-desktop
+Categories=Utility;Network;
+Keywords=AI;Copilot;GPT;ChatGPT;Gemini;DeepSeek;
+StartupWMClass=Gemini
+`;
+
+// Use a standard Chrome user-agent to avoid bot/embedded-browser detection
+const chromeVersion = process.versions.chrome;
+const standardUA = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
+app.userAgentFallback = standardUA;
+
+// Remove navigator.webdriver flag that marks this as an automated browser
+app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
+
 function initializeAutostart() {
-  if (fs.existsSync(snapUserData + '/.config/autostart/gemini-desktop.desktop')) {
-    console.log('Autostart file exists')
-    autostart = true;
-  } else {
-    console.log('Autostart file does not exist')
+  try {
+    autostart = fs.existsSync(autostartFile);
+  } catch (e) {
     autostart = false;
   }
 }
 
 function handleAutoStartChange() {
-  if (autostart) {
-    console.log("Enabling autostart");
-    if (!fs.existsSync(snapUserData + '/.config/autostart')) {
-      fs.mkdirSync(snapUserData + '/.config/autostart', { recursive: true });
+  try {
+    if (autostart) {
+      if (!fs.existsSync(autostartDir)) {
+        fs.mkdirSync(autostartDir, { recursive: true });
+      }
+      fs.writeFileSync(autostartFile, autostartDesktopContent, 'utf-8');
+    } else {
+      if (fs.existsSync(autostartFile)) {
+        fs.rmSync(autostartFile);
+      }
     }
-    if (!fs.existsSync(snapUserData + '/.config/autostart/gemini-desktop.desktop')) {
-      fs.copyFileSync(snapPath + '/com.github.kenvandine.gemini-desktop-autostart.desktop', snapUserData + '/.config/autostart/gemini-desktop.desktop');
-    }
-  } else {
-    console.log("Disabling autostart");
-    if (fs.existsSync(snapUserData + '/.config/autostart/gemini-desktop.desktop')) {
-      fs.rmSync(snapUserData + '/.config/autostart/gemini-desktop.desktop');
-    }
+  } catch (error) {
+    console.error('Failed to update autostart configuration:', error);
   }
 }
 

@@ -48,7 +48,12 @@
         .about-author {
             font-size: 14px;
             color: #5f6368;
-            margin-bottom: 24px;
+            margin-bottom: 6px;
+        }
+        .about-attribution {
+            font-size: 12px;
+            color: #80868b;
+            margin-bottom: 20px;
         }
         .about-links {
             margin-bottom: 24px;
@@ -96,6 +101,9 @@
             .about-author {
                 color: #9aa0a6;
             }
+            .about-attribution {
+                color: #80868b;
+            }
             .about-links a {
                 color: #8ab4f8;
             }
@@ -111,7 +119,8 @@
         <div class="about-header"><span id="app-title"></span></div>
         <div class="about-version">Version <span id="app-version"></span></div>
         <div class="about-author">By <span id="app-author"></span></div>
-        <div class="about-links"><a target="_blank" rel="noopener noreferrer" href="@@BUGURL@@">Report an issue</a></div>
+        <div class="about-attribution">Based on work by Ken VanDine</div>
+        <div class="about-links"><a id="bug-link" target="_blank" rel="noopener noreferrer" href="https://github.com/vish-1109/gemini-desktop/issues">Report an issue</a></div>
         <button class="btn-close" onclick="window.close();">Close</button>
     </div>
     <script>
@@ -128,9 +137,10 @@
             document.getElementById('app-author').innerText = author;
         });
         ipcRenderer.on('app-bugs-url', (event, url) => {
-            document.querySelectorAll(`a[href="@@BUGURL@@"]`).forEach(anchor => {
-                anchor.href = url;
-            });
+            const bugLink = document.getElementById('bug-link');
+            if (bugLink && url) {
+                bugLink.href = url;
+            }
         });
 
         // Request metadata from main process

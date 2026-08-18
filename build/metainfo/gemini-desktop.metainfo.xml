@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>gemini-desktop.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Gemini</name>
+  <summary>Unofficial desktop client for Google Gemini</summary>
+  <developer id="com.github.vish-1109">
+    <name>Vishrut</name>
+  </developer>
+  <description>
+    <p>
+      An unofficial desktop web client providing an integrated Linux desktop experience for Google Gemini.
+    </p>
+    <p>
+      Based on original work by Ken VanDine.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/vish-1109/gemini-desktop</url>
+  <url type="bugtracker">https://github.com/vish-1109/gemini-desktop/issues</url>
+  <url type="vcs-browser">https://github.com/vish-1109/gemini-desktop</url>
+  <launchable type="desktop-id">gemini-desktop.desktop</launchable>
+  <provides>
+    <binary>gemini-desktop</binary>
+  </provides>
+  <releases>
+    <release version="1.0.0" date="2026-08-17">
+      <description>
+        <p>Initial native Debian package release.</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Utility</category>
+    <category>Network</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+</component>
