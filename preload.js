@@ -45,7 +45,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
         const link = target.closest('a');
         if (link && link.href && link.href.startsWith('http')) {
-                // Check if allowed host or Google auth domain
+            try {
+                const hostname = new URL(link.href).hostname;
                 const isAllowed = allowedHosts.has(hostname) ||
                     hostname === 'google.com' ||
                     hostname.endsWith('.google.com') ||
