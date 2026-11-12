@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Gemini</title>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-family);
+      background: radial-gradient(1200px 600px at 50% -10%, #e8f0fe 0%, #ffffff 60%);
+      color: var(--text-primary);
+      user-select: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: radial-gradient(1200px 600px at 50% -10%, #1a2233 0%, #0b0f19 60%);
+      }
+    }
+    .spark {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.65; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+    .label {
+      margin-top: 20px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      color: var(--text-secondary);
+    }
+    .dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+  </style>
+</head>
+<body>
+  <img class="spark" src="assets/icon.png" alt="Gemini">
+  <div class="label">Loading Gemini<span class="dots"></span></div>
+</body>
+</html>

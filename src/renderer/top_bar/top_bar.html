@@ -1,0 +1,161 @@
+<!doctype html>
+<html dir="auto" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Top Bar</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--surface-bg);
+      font-family: var(--font-family);
+      user-select: none;
+    }
+    .top-bar {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-inline-start: 12px;
+      padding-inline-end: 6px;
+      border-bottom: 1px solid var(--card-border);
+      -webkit-app-region: drag;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .brand-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    .brand-title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .offline-pill {
+      display: none;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--warning-bg);
+      color: var(--warning-color);
+    }
+    body.is-offline .offline-pill {
+      display: inline-flex;
+      align-items: center;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      -webkit-app-region: no-drag;
+    }
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+    .icon-btn:hover {
+      background: var(--hover-bg);
+      color: var(--text-primary);
+    }
+    .icon-btn:active {
+      background: var(--active-bg);
+    }
+    .icon-btn:focus-visible {
+      outline: 2px solid var(--md-primary);
+      outline-offset: -1px;
+    }
+    .icon-btn svg {
+      width: 17px;
+      height: 17px;
+      display: block;
+    }
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-inline-start: 4px;
+      padding-inline-start: 6px;
+      border-inline-start: 1px solid var(--divider-color);
+    }
+    body.native-frame .window-controls {
+      display: none;
+    }
+    .win-btn {
+      width: 30px;
+      height: 26px;
+      border-radius: 6px;
+    }
+    .win-btn.close:hover {
+      background: var(--close-hover-bg);
+      color: var(--close-hover-fg);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar" id="top-bar">
+    <div class="brand">
+      <img class="brand-icon" src="../assets/icon.png" alt="">
+      <span class="brand-title" id="app-title">Gemini</span>
+      <span class="offline-pill" id="offline-pill">Offline</span>
+    </div>
+
+    <div class="controls">
+      <button id="btn-account" class="icon-btn" type="button" aria-label="Account" title="Google Account">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+      </button>
+
+      <button id="btn-menu" class="icon-btn" type="button" aria-label="Main menu" title="Main menu">
+        <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
+          <path d="M200-560q-17 0-28.5-11.5T160-600t11.5-28.5T200-640H760q17 0 28.5 11.5T800-600t-11.5 28.5T760-560H200Zm0 240q-17 0-28.5-11.5T160-360t11.5-28.5T200-400H760q17 0 28.5 11.5T800-360t-11.5 28.5T760-320H200Z"/>
+        </svg>
+      </button>
+
+      <div class="window-controls" id="window-controls">
+        <button id="btn-min" class="icon-btn win-btn" type="button" aria-label="Minimize" title="Minimize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="6" y1="12" x2="18" y2="12"/>
+          </svg>
+        </button>
+        <button id="btn-max" class="icon-btn win-btn" type="button" aria-label="Maximize" title="Maximize">
+          <svg id="icon-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="1"/>
+          </svg>
+        </button>
+        <button id="btn-close" class="icon-btn win-btn close" type="button" aria-label="Close" title="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="7" y1="7" x2="17" y2="17"/>
+            <line x1="17" y1="7" x2="7" y2="17"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="top_bar.js"></script>
+</body>
+</html>

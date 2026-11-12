@@ -1,0 +1,15 @@
+node_modules/
+dist/
+out/
+coverage/
+screenshot.png
+*.log
+*.deb
+*.AppImage
+*.exe
+.env
+.env.*
+builder-effective-config.yaml
+builder-debug.yml
+.DS_Store
+Thumbs.db

@@ -1,0 +1,62 @@
+<!doctype html>
+<html dir="auto" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Back Bar</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-family);
+    }
+    body {
+      display: flex;
+      align-items: center;
+      background: var(--surface-container-low);
+      border-bottom: 1px solid var(--card-border);
+      user-select: none;
+    }
+    #btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-inline-start: 12px;
+      padding: 6px 14px 6px 10px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 140ms ease;
+    }
+    #btn-back:hover {
+      background: var(--hover-bg);
+    }
+    #btn-back:active {
+      background: var(--active-bg);
+    }
+    #arrow {
+      width: 19px;
+      height: 19px;
+      flex: none;
+    }
+    [dir="rtl"] #arrow {
+      transform: scaleX(-1);
+    }
+  </style>
+</head>
+<body>
+  <button id="btn-back" type="button">
+    <svg id="arrow" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
+      <path d="M313-440l196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13T177-480t2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480t-11.5 28.5T760-440H313Z"/>
+    </svg>
+    <span>Back to Gemini</span>
+  </button>
+  <script src="back_bar.js"></script>
+</body>
+</html>

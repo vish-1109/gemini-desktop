@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Settings - Gemini</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: var(--font-family);
+      background: transparent;
+      color: var(--text-primary);
+      user-select: none;
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-backdrop);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      width: clamp(360px, 74vw, 860px);
+      height: clamp(400px, 76vh, 640px);
+      max-width: calc(100vw - 28px);
+      max-height: calc(100vh - 28px);
+      box-shadow: var(--shadow-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--divider-color);
+      flex-shrink: 0;
+    }
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .close-btn:hover { background: var(--hover-bg); color: var(--text-primary); }
+
+    .restart-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 22px;
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+      font-size: 13px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .restart-banner.visible { display: flex; }
+
+    .modal-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: clamp(170px, 23vw, 230px);
+      background: var(--sidebar-bg);
+      border-inline-end: 1px solid var(--divider-color);
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      width: 100%;
+      text-align: start;
+      padding: 10px 14px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-item:hover { background: var(--hover-bg); color: var(--text-primary); }
+    .nav-item.active {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      font-weight: 600;
+    }
+    .nav-item svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+
+    .tab-content {
+      flex: 1;
+      padding: 22px 26px;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+    }
+    .tab-content.active { display: flex; }
+    .tab-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .tab-desc { font-size: 13px; color: var(--text-tertiary); margin-bottom: 18px; line-height: 1.4; }
+
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .setting-item {
+      background: var(--setting-card-bg);
+      border: 1px solid var(--setting-card-border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .setting-text { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+    .setting-label { font-size: 14px; font-weight: 500; }
+    .setting-sublabel { font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; }
+
+    .setting-select {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      min-width: 210px;
+      cursor: pointer;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      background: var(--switch-track-off);
+      cursor: pointer;
+      transition: background 180ms ease;
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 4px;
+      bottom: 4px;
+      border-radius: 50%;
+      background: var(--switch-thumb-off);
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    input:checked + .slider { background: var(--switch-track-on); }
+    input:checked + .slider::before {
+      transform: translateX(20px);
+      background: var(--switch-thumb-on);
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+    }
+    .btn-primary:hover { background: var(--md-primary-hover); }
+    .btn-outline {
+      background: transparent;
+      color: var(--md-primary);
+      border: 1px solid var(--card-border);
+    }
+    .btn-outline:hover { background: var(--hover-bg); }
+    .btn-danger {
+      background: transparent;
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+    }
+    .btn-danger:hover { background: var(--danger-hover-bg); }
+    .btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .logs-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .logs-panel.visible { display: flex; }
+    .logs-pre {
+      background: var(--preview-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: monospace;
+      font-size: 11.5px;
+      line-height: 1.45;
+      max-height: 180px;
+      overflow: auto;
+      white-space: pre-wrap;
+      user-select: text;
+      color: var(--text-secondary);
+    }
+
+    .about-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .about-header img { width: 42px; height: 42px; border-radius: 10px; }
+    .about-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--divider-color);
+      font-size: 13.5px;
+      gap: 12px;
+    }
+    .about-k { color: var(--text-tertiary); }
+    .about-v { color: var(--text-primary); font-weight: 500; user-select: text; }
+    .update-status {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--divider-color);
+    }
+
+    @media (max-width: 620px) {
+      .modal-body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        border-inline-end: none;
+        border-bottom: 1px solid var(--divider-color);
+        padding: 8px 12px;
+        overflow-x: auto;
+      }
+      .setting-item { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop" id="backdrop">
+    <div class="modal-card" id="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-heading">
+      <div class="modal-header">
+        <h2 id="settings-heading">Settings</h2>
+        <button class="close-btn" id="btn-close-modal" type="button" aria-label="Close" title="Close (Esc)">✕</button>
+      </div>
+
+      <div class="restart-banner" id="restart-banner">
+        <span>Window frame style changed. Restart Gemini to apply the new titlebar mode.</span>
+        <button class="btn btn-primary" id="btn-restart-now" type="button">Restart Now</button>
+      </div>
+
+      <div class="modal-body">
+        <nav class="sidebar" aria-label="Settings sections">
+          <button class="nav-item active" id="nav-general" type="button" data-tab="general">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.61l-1.92-3.32a.5.5 0 0 0-.59-.22l-2.39.96a7.1 7.1 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+            <span>General</span>
+          </button>
+          <button class="nav-item" id="nav-privacy" type="button" data-tab="privacy">
+            <svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 11h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11V12z"/></svg>
+            <span>Privacy &amp; Permissions</span>
+          </button>
+          <button class="nav-item" id="nav-about" type="button" data-tab="about">
+            <svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0-7a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+            <span>About Gemini</span>
+          </button>
+        </nav>
+
+        <!-- General Tab -->
+        <section class="tab-content active" id="tab-general">
+          <h3 class="tab-title">General</h3>
+          <p class="tab-desc">Window behavior, startup options, and notifications.</p>
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Launch at login</span>
+                <span class="setting-sublabel">Starts Gemini quietly in your system tray when you log in (~/.config/autostart).</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-autostart">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Close window hides to tray</span>
+                <span class="setting-sublabel">Keep Gemini running in the system tray when closing the window.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-close-to-tray">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Start minimized in tray</span>
+                <span class="setting-sublabel">Launch hidden in the tray on normal startups unless toggled open.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-start-in-tray">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Notify when response completes</span>
+                <span class="setting-sublabel">Send a desktop notification when Gemini finishes a reply while the window is hidden or unfocused.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-notify-turn">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Window frame style</span>
+                <span class="setting-sublabel">Choose sleek Material titlebar or native Linux system titlebar (restart required).</span>
+              </div>
+              <select class="setting-select" id="select-frame-style">
+                <option value="custom">Custom Gemini Titlebar</option>
+                <option value="native">System Window Frame</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Default page zoom</span>
+                <span class="setting-sublabel">Adjust text and layout scaling (or press Ctrl+ / Ctrl- anytime).</span>
+              </div>
+              <select class="setting-select" id="select-zoom">
+                <option value="-1">90%</option>
+                <option value="0">100% (Default)</option>
+                <option value="0.5">110%</option>
+                <option value="1">120%</option>
+                <option value="1.5">135%</option>
+                <option value="2">150%</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary btn-done" type="button">Done</button>
+          </div>
+        </section>
+
+        <!-- Privacy & Permissions Tab -->
+        <section class="tab-content" id="tab-privacy">
+          <h3 class="tab-title">Privacy &amp; Permissions</h3>
+          <p class="tab-desc">Control hardware permissions, Google session state, updates, and local diagnostic logs. No Google telemetry is sent.</p>
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Google Account</span>
+                <span class="setting-sublabel">Switch between signed-in Google accounts or clear session cookies.</span>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-outline" id="btn-switch-account" type="button">Switch Account</button>
+                <button class="btn btn-danger" id="btn-sign-out" type="button">Sign Out</button>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Microphone access</span>
+                <span class="setting-sublabel">Allow Gemini Live and voice prompts to use your microphone.</span>
+              </div>
+              <select class="setting-select" id="perm-media">
+                <option value="ask">Ask every time</option>
+                <option value="granted">Allow</option>
+                <option value="denied">Block</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Camera access</span>
+                <span class="setting-sublabel">Allow Gemini to capture camera input when requested.</span>
+              </div>
+              <select class="setting-select" id="perm-camera">
+                <option value="ask">Ask every time</option>
+                <option value="granted">Allow</option>
+                <option value="denied">Block</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Location access</span>
+                <span class="setting-sublabel">Allow Gemini to query approximate browser location when requested.</span>
+              </div>
+              <select class="setting-select" id="perm-geolocation">
+                <option value="ask">Ask every time</option>
+                <option value="granted">Allow</option>
+                <option value="denied">Block</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Web notifications &amp; clipboard</span>
+                <span class="setting-sublabel">Allow Gemini pages to request desktop notifications and clipboard read access.</span>
+              </div>
+              <div class="btn-group">
+                <select class="setting-select" id="perm-notifications" style="min-width: 120px;">
+                  <option value="ask">Notify: Ask</option>
+                  <option value="granted">Notify: Allow</option>
+                  <option value="denied">Notify: Block</option>
+                </select>
+                <select class="setting-select" id="perm-clipboard" style="min-width: 130px;">
+                  <option value="ask">Clip: Ask</option>
+                  <option value="granted">Clip: Allow</option>
+                  <option value="denied">Clip: Block</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Check GitHub Releases automatically</span>
+                <span class="setting-sublabel">Checks public GitHub Releases on launch with zero user identifiers.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-auto-updates">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-text">
+                <span class="setting-label">Sanitized diagnostic logs</span>
+                <span class="setting-sublabel">View recent local logs with home paths, emails, and tokens automatically redacted.</span>
+                <div class="logs-panel" id="logs-panel">
+                  <pre class="logs-pre" id="logs-pre"></pre>
+                </div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-outline" id="btn-toggle-logs" type="button">View Logs</button>
+                <button class="btn btn-outline" id="btn-copy-logs" type="button">Copy</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="justify-content: space-between;">
+            <button class="btn btn-danger" id="btn-reset-permissions" type="button">Reset Stored Permissions</button>
+            <button class="btn btn-primary btn-done" type="button">Done</button>
+          </div>
+        </section>
+
+        <!-- About Tab -->
+        <section class="tab-content" id="tab-about">
+          <div class="about-header">
+            <img src="../assets/icon.png" alt="Gemini">
+            <div>
+              <h3 class="tab-title">Gemini Desktop for Linux</h3>
+              <p class="tab-desc" style="margin-bottom: 0;">GPL-3.0 desktop client • Maintainer: Vishrut</p>
+            </div>
+          </div>
+
+          <div class="about-row">
+            <span class="about-k">App Version</span>
+            <span class="about-v" id="about-version">-</span>
+          </div>
+          <div class="about-row">
+            <span class="about-k">Electron / Chromium</span>
+            <span class="about-v" id="about-runtime">-</span>
+          </div>
+          <div class="about-row">
+            <span class="about-k">Linux Display Session</span>
+            <span class="about-v" id="about-session">-</span>
+          </div>
+          <div class="about-row">
+            <span class="about-k">Updates</span>
+            <div class="btn-group">
+              <button class="btn btn-outline" id="btn-check-updates" type="button">Check for Updates</button>
+              <button class="btn btn-primary" id="btn-open-release" type="button" style="display: none;">View Release</button>
+            </div>
+          </div>
+          <div class="update-status" id="update-status"></div>
+
+          <div class="about-row" style="margin-top: 10px;">
+            <span class="about-k">Source &amp; Support</span>
+            <div class="btn-group">
+              <button class="btn btn-outline" id="btn-open-repo" type="button">GitHub Repo</button>
+              <button class="btn btn-outline" id="btn-open-issues" type="button">Report Issue</button>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-primary btn-done" type="button">Done</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>

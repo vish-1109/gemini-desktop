@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.vish1109.gemini.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Gemini</name>
+  <summary>Desktop client for Google Gemini</summary>
+
+  <icon type="stock">gemini-desktop</icon>
+
+  <description>
+    <p>
+      Gemini Desktop is a desktop client for Google Gemini, built for Linux
+      desktop environments with native window controls, system tray integration,
+      and sandboxed web isolation. Keep Google Gemini quickly accessible with
+      Wayland and X11 support, native desktop notifications, and PipeWire screen sharing.
+    </p>
+    <p>Key Features:</p>
+    <ul>
+      <li>Native Linux window integration with frameless and titlebar mode options</li>
+      <li>System tray support with minimize-to-tray and quick-toggle CLI</li>
+      <li>Wayland and X11 display support (auto-detected with Chromium flag override)</li>
+      <li>Screen sharing support via PipeWire on Wayland and X11</li>
+      <li>Native desktop notifications and permission prompts</li>
+      <li>Autostart on login and configurable window frame style</li>
+      <li>Automatic update notifications from GitHub Releases</li>
+      <li>Light and dark Material 3 desktop settings interface</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.vish1109.gemini.desktop</launchable>
+
+  <url type="homepage">https://github.com/vish-1109/gemini-desktop</url>
+  <url type="bugtracker">https://github.com/vish-1109/gemini-desktop/issues</url>
+  <url type="vcs-browser">https://github.com/vish-1109/gemini-desktop</url>
+
+  <developer id="io.github.vish1109">
+    <name>Vishrut</name>
+  </developer>
+
+  <content_rating type="oars-1.1" />
+
+  <provides>
+    <id>gemini-desktop.desktop</id>
+    <binary>gemini-desktop</binary>
+  </provides>
+  <pkgname>gemini-desktop</pkgname>
+
+  <categories>
+    <category>Utility</category>
+    <category>Network</category>
+  </categories>
+
+  <keywords>
+    <keyword>ai</keyword>
+    <keyword>gemini</keyword>
+    <keyword>google</keyword>
+    <keyword>chat</keyword>
+    <keyword>assistant</keyword>
+    <keyword>llm</keyword>
+    <keyword>productivity</keyword>
+  </keywords>
+
+  <releases>
+    <release version="1.0.0" date="2026-11-12">
+      <description>
+        <p>Initial Linux release featuring isolated browser views with strict sandboxing, Material 3 Linux settings and control chrome, Wayland and X11 display support, PipeWire screen sharing, system tray and quick-toggle support, and native Debian (.deb) and AppImage packaging.</p>
+      </description>
+    </release>
+  </releases>
+</component>
